@@ -1,0 +1,91 @@
+Resources:
+  # API Gateway Resource
+  ApiGateway:
+    Type: "AWS::ApiGateway::RestApi"
+    Properties:
+      Name: "CircuitBreakerApiGateway"
+
+  # IAM Role for Lambda Execution
+  LambdaExecutionRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service: "lambda.amazonaws.com"
+            Action: "sts:AssumeRole"
+      Policies:
+        - PolicyName: "LambdaExecutionPolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - "logs:*"
+                  - "dynamodb:*"
+                  - "s3:*"
+                  - "rds:*"
+                  - "elasticache:*"
+                Resource: "*"
+
+  # Retry Lambda Function
+  RetryLambdaFunction:
+    Type: "AWS::Lambda::Function"
+    Properties:
+      FunctionName: "RetryLambdaFunction"
+      Handler: "RetryFunction::RetryFunction.FunctionHandler"
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Code:
+        S3Bucket: "your-code-bucket"   # Replace with your S3 bucket name
+        S3Key: "retry-lambda.zip"      # Replace with your S3 key for the zip file
+      Runtime: "dotnet8"              
+
+  # Fallback Lambda Function
+  FallbackLambdaFunction:
+    Type: "AWS::Lambda::Function"
+    Properties:
+      FunctionName: "FallbackLambdaFunction"
+      Handler: "FallbackFunction::FallbackFunction.FunctionHandler"
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Code:
+        S3Bucket: "your-code-bucket"   # Replace with your S3 bucket name
+        S3Key: "fallback-lambda.zip"   # Replace with your S3 key for the zip file
+      Runtime: "dotnet8"              
+
+  # API Lambda Function
+  ApiLambdaFunction:
+    Type: "AWS::Lambda::Function"
+    Properties:
+      FunctionName: "ApiLambdaFunction"
+      Handler: "ApiFunction::ApiFunction.FunctionHandler"
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Code:
+        S3Bucket: "your-code-bucket"   # Replace with your S3 bucket name
+        S3Key: "api-lambda.zip"        # Replace with your S3 key for the zip file
+      Runtime: "dotnet8"              
+
+  # ElastiCache Redis Cluster
+  ElastiCacheRedisCluster:
+    Type: "AWS::ElastiCache::CacheCluster"
+    Properties:
+      Engine: "redis"
+      CacheNodeType: "cache.t2.micro"
+      NumCacheNodes: 1
+
+  # RDS PostgreSQL Database Instance
+  RDSInstance:
+    Type: "AWS::RDS::DBInstance"
+    Properties:
+      Engine: "postgres"
+      DBInstanceClass: "db.t3.micro"
+      AllocatedStorage: 20
+      DBName: "CircuitBreakerDB"
+      MasterUsername: "adminuser"
+      MasterUserPassword: "Password@123"
+
+Outputs:
+  ApiGatewayUrl:
+    Description: "URL of the API Gateway"
+    Value: !Sub "https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/prod/"

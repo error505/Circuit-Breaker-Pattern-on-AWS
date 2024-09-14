@@ -1,0 +1,49 @@
+name: Deploy API Lambda Function
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v3
+
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore api-lambda/ApiLambda.csproj
+
+      - name: Build the Lambda function
+        run: dotnet build api-lambda/ApiLambda.csproj --configuration Release
+
+      - name: Publish the Lambda function
+        run: dotnet publish api-lambda/ApiLambda.csproj --configuration Release --output ./publish
+
+      - name: Install AWS CLI
+        run: |
+          sudo apt-get install unzip
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+          unzip awscliv2.zip
+          sudo ./aws/install
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Deploy to AWS Lambda
+        run: |
+          aws lambda update-function-code --function-name ${LAMBDA_FUNCTION_NAME_API} --zip-file fileb://./publish/api-lambda.zip
+        env:
+          LAMBDA_FUNCTION_NAME_API: ${{ secrets.AWS_LAMBDA_API_FUNCTION_NAME }}
