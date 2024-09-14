@@ -40,7 +40,7 @@ Resources:
       Code:
         S3Bucket: "your-code-bucket"   # Replace with your S3 bucket name
         S3Key: "retry-lambda.zip"      # Replace with your S3 key for the zip file
-      Runtime: "dotnet8"              
+      Runtime: "dotnet8"               # Use the correct runtime version for .NET 8
 
   # Fallback Lambda Function
   FallbackLambdaFunction:
@@ -52,7 +52,7 @@ Resources:
       Code:
         S3Bucket: "your-code-bucket"   # Replace with your S3 bucket name
         S3Key: "fallback-lambda.zip"   # Replace with your S3 key for the zip file
-      Runtime: "dotnet8"              
+      Runtime: "dotnet8"               # Use the correct runtime version for .NET 8
 
   # API Lambda Function
   ApiLambdaFunction:
@@ -64,7 +64,7 @@ Resources:
       Code:
         S3Bucket: "your-code-bucket"   # Replace with your S3 bucket name
         S3Key: "api-lambda.zip"        # Replace with your S3 key for the zip file
-      Runtime: "dotnet8"              
+      Runtime: "dotnet8"               # Use the correct runtime version for .NET 8
 
   # ElastiCache Redis Cluster
   ElastiCacheRedisCluster:
@@ -85,7 +85,37 @@ Resources:
       MasterUsername: "adminuser"
       MasterUserPassword: "Password@123"
 
+  # AWS Amplify App Resource
+  AmplifyApp:
+    Type: AWS::Amplify::App
+    Properties:
+      Name: "CircuitBreakerFrontendApp"
+      Repository: "https://github.com/your-repo/circuit-breaker-frontend" # Replace with your repository URL
+      Branches:
+        - BranchName: "main"
+      BuildSpec: |
+        version: 1.0
+        frontend:
+          phases:
+            preBuild:
+              commands:
+                - npm install
+            build:
+              commands:
+                - npm run build
+          artifacts:
+            baseDirectory: /build
+            files:
+              - '**/*'
+          cache:
+            paths:
+              - node_modules/**/*
+
 Outputs:
   ApiGatewayUrl:
     Description: "URL of the API Gateway"
     Value: !Sub "https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/prod/"
+
+  AmplifyAppUrl:
+    Description: "URL of the AWS Amplify Frontend App"
+    Value: !Sub "https://${AmplifyApp}.amplifyapp.com"
