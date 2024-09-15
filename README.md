@@ -6,6 +6,8 @@ The architecture integrates multiple cloud patterns, including **Circuit Breaker
 
 ## 🏗️ Architecture Overview
 
+![image](https://github.com/user-attachments/assets/fef20c85-216e-43a3-9bdb-b3fd49170aec)
+
 The architecture consists of the following components:
 
 1. **AWS API Gateway**: Acts as the main entry point for incoming client requests and routes them to the API Lambda function.
@@ -16,8 +18,6 @@ The architecture consists of the following components:
 6. **Amazon RDS (PostgreSQL or MySQL)**: Stores data persistently for the application.
 7. **AWS Amplify**: Hosts the React TypeScript front-end application, allowing users to interact with the API.
 8. **Amazon CloudWatch**: Monitors and collects logs, metrics, and telemetry data from all services.
-
-![image](https://github.com/user-attachments/assets/fef20c85-216e-43a3-9bdb-b3fd49170aec)
 
 ### 📊 Architectural Diagram
 
