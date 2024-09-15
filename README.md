@@ -119,7 +119,7 @@ Contributions are welcome! Please open an issue or submit a pull request for any
 
 ## 📞 Support
 
-If you have any questions or need support, please open an issue or contact the repository maintainer.
+If you have any questions or need support, please open an issue.
 
 ## 🏷️ Tags
 
