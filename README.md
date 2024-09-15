@@ -13,11 +13,11 @@ The architecture consists of the following components:
 3. **Retry Lambda Function**: Handles normal operations, such as reading/writing to the RDS database and updating the ElastiCache.
 4. **Fallback Lambda Function**: Provides cached or alternative data when the main services are unavailable.
 5. **Amazon ElastiCache (Redis)**: Caches data to reduce load on the RDS database and improve performance.
-6. **Amazon RDS (
-
-PostgreSQL or MySQL)**: Stores data persistently for the application.
+6. **Amazon RDS (PostgreSQL or MySQL)**: Stores data persistently for the application.
 7. **AWS Amplify**: Hosts the React TypeScript front-end application, allowing users to interact with the API.
 8. **Amazon CloudWatch**: Monitors and collects logs, metrics, and telemetry data from all services.
+
+![image](https://github.com/user-attachments/assets/fef20c85-216e-43a3-9bdb-b3fd49170aec)
 
 ### 📊 Architectural Diagram
 
